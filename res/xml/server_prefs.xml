@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : edit_server.xml
+    Created on : April 2, 2010, 2:46 PM
+    Author     : eric
+    Description:
+        Purpose of the document follows.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="Add Server">
+
+    <EditTextPreference android:key="hostname"
+        android:title="Hostname"
+        android:dialogTitle="Hostname"
+        android:singleLine="true"
+        android:persistent="false" />
+
+    <EditTextPreference android:key="port"
+        android:title="Port"
+        android:dialogTitle="Port"
+        android:numeric="integer"
+        android:persistent="false"
+        android:defaultValue="3689" />
+
+</PreferenceScreen>

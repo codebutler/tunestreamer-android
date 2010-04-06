@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.codebutler.tunestreamer">
+
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="7" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application android:name=".TuneStreamerApp">
+
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".SearchActivity"
+        />
+
+         <activity android:name=".MainActivity"
+                   android:label="TuneStreamer"
+                   android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".LibraryActivity" android:label="Library"
+        android:configChanges="keyboardHidden|orientation">
+        </activity>
+
+        <activity android:name=".ArtistListActivity" android:label="Artists">
+        </activity>
+
+        <activity android:name=".AlbumListActivity" android:label="Artists">
+        </activity>
+
+        <activity android:name=".SongListActivity" android:label="Songs">
+        </activity>
+
+        <activity android:name=".PlaylistsActivity" android:label="Playlists">
+        </activity>
+
+        <activity android:name=".AddServerActivity" android:label="Add Server">
+        </activity>
+
+        <activity android:name=".AlbumActivity" android:label="Album">
+        </activity>
+
+        <activity android:name=".PlaylistActivity" android:label="Playlist">
+        </activity>
+
+        <activity android:name=".SearchActivity"
+                  android:label="Search"
+                  android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                       android:resource="@xml/searchable" />
+        </activity>
+
+    </application>
+</manifest>
