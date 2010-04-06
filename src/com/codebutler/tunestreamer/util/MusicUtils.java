@@ -17,9 +17,10 @@
  * limitations under the License.
  */
 
-package com.codebutler.tunestreamer;
+package com.codebutler.tunestreamer.util;
 
 import android.content.Context;
+import com.codebutler.tunestreamer.R;
 import java.util.Formatter;
 import java.util.Locale;
 

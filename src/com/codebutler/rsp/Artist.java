@@ -22,7 +22,8 @@
 
 package com.codebutler.rsp;
 
-import java.util.ArrayList;
+import com.codebutler.tunestreamer.util.SortedArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,12 @@ public class Artist
    public Artist (String name)
    {
        mName = name;
-       mOrderedAlbums = new ArrayList<Album>();
+       mOrderedAlbums = new SortedArrayList<Album>(new Comparator<Album> () {
+            public int compare(Album first, Album second) {
+                return first.getName().compareToIgnoreCase(second.getName());
+            }
+        });
+
        mAlbums = new HashMap<String, Album>();
    }
 

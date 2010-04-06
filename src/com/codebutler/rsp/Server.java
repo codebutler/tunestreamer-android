@@ -22,9 +22,11 @@
 
 package com.codebutler.rsp;
 
+import com.codebutler.tunestreamer.util.SortedArrayList;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -191,7 +193,11 @@ public class Server
 
        NodeList playlists = playlistsElement.getChildNodes();
 
-       mPlaylists = new ArrayList<Playlist>();
+       mPlaylists = new SortedArrayList<Playlist>(new Comparator<Playlist> () {
+            public int compare(Playlist first, Playlist second) {
+                return first.getTitle().compareToIgnoreCase(second.getTitle());
+            }
+        });
 
        for (int x = 0; x < playlists.getLength(); x++) {
            Element playlistElement = (Element) playlists.item(x);

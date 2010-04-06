@@ -22,7 +22,8 @@
 
 package com.codebutler.rsp;
 
-import java.util.ArrayList;
+import com.codebutler.tunestreamer.util.SortedArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Album
@@ -39,7 +40,11 @@ public class Album
         mArtist = artist;
         mName   = name;
 
-        mItems = new ArrayList<Item>();
+        mItems = new SortedArrayList<Item>(new Comparator<Item> () {
+            public int compare(Item first, Item second) {
+                return first.getTitle().compareToIgnoreCase(second.getTitle());
+            }
+        });
 
         mId = sLastId;
         sLastId ++;

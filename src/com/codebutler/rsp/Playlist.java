@@ -28,9 +28,10 @@ import android.sax.EndTextElementListener;
 import android.sax.RootElement;
 import android.util.Log;
 import android.util.Xml;
+import com.codebutler.tunestreamer.util.SortedArrayList;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,10 +124,25 @@ public class Playlist
         if (mItems != null)
             throw new Exception("fetchItems() already called!");
 
-        mItems = new ArrayList<Item>();
-        mOrderedArtists = new ArrayList<Artist>();
+        mItems = new SortedArrayList<Item>(new Comparator<Item> () {
+            public int compare(Item first, Item second) {
+                return first.getTitle().compareToIgnoreCase(second.getTitle());
+            }
+        });
+
+        mOrderedArtists = new SortedArrayList<Artist>(new Comparator<Artist> () {
+            public int compare(Artist first, Artist second) {
+                return first.getName().compareToIgnoreCase(second.getName());
+            }
+        });
+
         mArtists = new HashMap<String, Artist>();
-        mAlbums = new ArrayList<Album>();
+
+        mAlbums = new SortedArrayList<Album>(new Comparator<Album> () {
+            public int compare(Album first, Album second) {
+                return first.getName().compareToIgnoreCase(second.getName());
+            }
+        });
 
         URL url = mServer.buildUrl("db/" + Integer.toString(mId));
         Log.d("FetchItems", url.toString());
