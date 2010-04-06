@@ -208,22 +208,27 @@ public class Playlist
 
                 // Artist cache
                 String artistName = mCurrentItem.getArtist();
-                Artist artist = mArtists.get(artistName);
-                if (artist == null) {
-                    artist = new Artist(artistName);
-                    mArtists.put(artistName, artist);
-                    mOrderedArtists.add(artist);
-                }
+                if (artistName != null && artistName.trim().length() > 0) {
+                    Artist artist = mArtists.get(artistName);
+                    if (artist == null) {
+                        artist = new Artist(artistName);
+                        mArtists.put(artistName, artist);
+                        mOrderedArtists.add(artist);
+                    }
 
-                // Album cache
-                String albumName = mCurrentItem.getAlbum();
-                Album album = artist.getAlbum(albumName);
-                if (album == null) {
-                    album = new Album(artist, albumName);
-                    artist.addAlbum(album);
-                    mAlbums.add(album);
+                    // Album cache
+                    // FIXME: This should support compilation albums!
+                    String albumName = mCurrentItem.getAlbum();
+                    if (albumName != null && albumName.trim().length() > 0) {
+                        Album album = artist.getAlbum(albumName);
+                        if (album == null) {
+                            album = new Album(artist, albumName);
+                            artist.addAlbum(album);
+                            mAlbums.add(album);
+                        }
+                        album.addItem(mCurrentItem);
+                    }
                 }
-                album.addItem(mCurrentItem);
 
                 mCurrentItem = null;
 
