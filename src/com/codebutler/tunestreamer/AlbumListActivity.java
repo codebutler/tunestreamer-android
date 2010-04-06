@@ -54,10 +54,9 @@ public class AlbumListActivity extends ListActivity
 
         LibraryActivity parentActivity = (LibraryActivity)getParent();
         int serverId   = parentActivity.getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
-        int playlistId = parentActivity.getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
 
         TuneStreamerApp app = (TuneStreamerApp) getApplication();
-        mLibrary = app.getServer(serverId).getPlaylist(playlistId);
+        mLibrary = app.getServer(serverId).getMainLibrary();
 
         setListAdapter(new AlbumListAdapter(this, mLibrary.getAlbums()));
     }
@@ -79,7 +78,6 @@ public class AlbumListActivity extends ListActivity
 
             Intent intent = new Intent(this, AlbumActivity.class);
             intent.putExtra(LibraryActivity.SERVER_ID, mLibrary.getServer().getId());
-            intent.putExtra(LibraryActivity.PLAYLIST_ID, mLibrary.getId());
             intent.putExtra(LibraryActivity.ALBUM_ID, album.getId());
             startActivity(intent);
         } catch (Exception ex) {

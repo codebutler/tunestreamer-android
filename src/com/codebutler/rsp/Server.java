@@ -83,6 +83,11 @@ public class Server
         return mCount;
     }
 
+    public boolean isLoaded ()
+    {
+        return (mName != null) && (mPlaylists != null);
+    }
+
     public Playlist getMainLibrary ()
     {
         return getPlaylist("Library");

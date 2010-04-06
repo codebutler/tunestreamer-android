@@ -38,8 +38,11 @@ public class TuneStreamerApp extends android.app.Application
 
     public Server getServer (int id)
     {
-        // FIXME: Might be better to use a reliable id in the future.
-        return mServers.get(id);
+        for (Server server : mServers) {
+            if (server.getId() == id)
+                return server;
+        }
+        return null;
     }
 
     @Override

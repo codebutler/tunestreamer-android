@@ -35,7 +35,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.codebutler.rsp.Playlist;
 import com.codebutler.rsp.Server;
 import java.util.List;
 
@@ -79,14 +78,20 @@ public class MainActivity extends ListActivity
     protected void onListItemClick (ListView list, View view, int position, long id)
     {
         final Server server = (Server) list.getItemAtPosition(position);
-        new ServerLoader(this, server, new ServerLoader.ServerLoaderListener () {
-            public void onFinish (Playlist library) {
+
+        ServerLoader.ServerLoaderListener listener = new ServerLoader.ServerLoaderListener () {
+            public void onFinish () {
                 Intent intent = new Intent(MainActivity.this, LibraryActivity.class);
                 intent.putExtra(LibraryActivity.SERVER_ID, server.getId());
-                intent.putExtra(LibraryActivity.PLAYLIST_ID, library.getId());
                 startActivity(intent);
             }
-        }).load();
+        };
+
+        if (!server.isLoaded()) {
+            new ServerLoader(this, server, listener).load();
+        } else {
+            listener.onFinish();
+        }
     }
 
     @Override

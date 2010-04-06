@@ -56,11 +56,10 @@ public class LibraryActivity extends TabActivity
         super.onCreate(bundle);
 
         int serverId   = getIntent().getExtras().getInt(SERVER_ID);
-        int playlistId = getIntent().getExtras().getInt(PLAYLIST_ID);
 
         TuneStreamerApp app = (TuneStreamerApp) getApplication();
         mServer  = app.getServer(serverId);
-        mLibrary = mServer.getPlaylist(playlistId);
+        mLibrary = mServer.getMainLibrary();
 
         setContentView(R.layout.library);
 

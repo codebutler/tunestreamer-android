@@ -127,7 +127,7 @@ public class ServerLoader
                     break;
                 case STATUS_FINISHED:
                     mDialog.dismiss();
-                    mListener.onFinish(mLibrary);
+                    mListener.onFinish();
                     break;
                 case STATUS_ERROR:
                     Exception err = (Exception) msg.obj;
@@ -162,6 +162,6 @@ public class ServerLoader
 
     public interface ServerLoaderListener
     {
-        public void onFinish (Playlist library);
+        public void onFinish ();
     }
 }

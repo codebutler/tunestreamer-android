@@ -5,8 +5,8 @@ TuneStreamer is a music player for Android that allows you to remotely access yo
 
 TuneStreamer has been tested with the following servers:
 
-* [forked-daapd][forked-daapd] (recommended. Ubuntu packages available [here][forked-daapd-packages].)
-* [Firefly Media Server][firefly] (not recommended)
+* [forked-daapd][forked-daapd] (Recommended. Ubuntu packages available [here][forked-daapd-packages].)
+* [Firefly Media Server][firefly] (Not recommended.)
 
 [daap]: http://en.wikipedia.org/wiki/Digital_Audio_Access_Protocol
 [forked-daapd]: http://git.debian.org/?p=users/jblache/forked-daapd.git

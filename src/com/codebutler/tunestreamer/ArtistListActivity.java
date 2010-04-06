@@ -50,10 +50,9 @@ public class ArtistListActivity extends ExpandableListActivity
 
         LibraryActivity parentActivity = (LibraryActivity)getParent();
         int serverId   = parentActivity.getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
-        int playlistId = parentActivity.getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
 
         TuneStreamerApp app = (TuneStreamerApp) getApplication();
-        mLibrary = app.getServer(serverId).getPlaylist(playlistId);
+        mLibrary = app.getServer(serverId).getMainLibrary();
 
         setListAdapter(new ArtistListAdapter(this, mLibrary));
     }
@@ -68,7 +67,6 @@ public class ArtistListActivity extends ExpandableListActivity
 
             Intent intent = new Intent(this, AlbumActivity.class);
             intent.putExtra(LibraryActivity.SERVER_ID, mLibrary.getServer().getId());
-            intent.putExtra(LibraryActivity.PLAYLIST_ID, mLibrary.getId());
             intent.putExtra(LibraryActivity.ALBUM_ID, album.getId());
             startActivity(intent);
 
@@ -85,7 +83,6 @@ public class ArtistListActivity extends ExpandableListActivity
     {
         Bundle appData = new Bundle();
         appData.putInt(LibraryActivity.SERVER_ID, mLibrary.getServer().getId());
-        appData.putInt(LibraryActivity.PLAYLIST_ID, mLibrary.getId());
         startSearch(null, false, appData, false);
         return true;
     }
@@ -107,8 +104,7 @@ public class ArtistListActivity extends ExpandableListActivity
                 Artist artist = (Artist) getGroup(groupPosition);
                 return artist.getAlbums().get(childPosition);
             } catch (Exception ex) {
-                Log.e("ArtistListAdapter", ex.toString());
-                ex.printStackTrace();
+                GuiUtil.showErrorAndFinish(mActivity, ex);
                 return null;
             }
         }
@@ -146,8 +142,7 @@ public class ArtistListActivity extends ExpandableListActivity
 
                 return convertView;
             } catch (Exception ex) {
-                Log.e("ArtistListAdapter", ex.toString());
-                ex.printStackTrace();
+                GuiUtil.showErrorAndFinish(mActivity, ex);
                 return null;
             }
         }
@@ -158,8 +153,7 @@ public class ArtistListActivity extends ExpandableListActivity
                 Artist artist = (Artist) getGroup(groupPosition);
                 return artist.getAlbums().size();
             } catch (Exception ex) {
-                Log.e("ArtistListAdapter", ex.toString());
-                ex.printStackTrace();
+                GuiUtil.showErrorAndFinish(mActivity, ex);
                 return 0;
             }
         }
@@ -169,8 +163,7 @@ public class ArtistListActivity extends ExpandableListActivity
             try {
                 return mPlaylist.getArtists().get(groupPosition);
             } catch (Exception ex) {
-                Log.e("ArtistListAdapter", ex.toString());
-                ex.printStackTrace();
+                GuiUtil.showErrorAndFinish(mActivity, ex);
                 return 0;
             }
         }
@@ -180,8 +173,7 @@ public class ArtistListActivity extends ExpandableListActivity
             try {
                 return mPlaylist.getArtists().size();
             } catch (Exception ex) {
-                Log.e("ArtistListAdapter", ex.toString());
-                ex.printStackTrace();
+                GuiUtil.showErrorAndFinish(mActivity, ex);
                 return 0;
             }
         }

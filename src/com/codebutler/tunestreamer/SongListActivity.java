@@ -60,14 +60,14 @@ public class SongListActivity extends ListActivity
 
         getListView().setFastScrollEnabled(true);
 
+        // Are we inside the main tab container?
         if (getParent() != null) {
             try {
                 TuneStreamerApp app = (TuneStreamerApp) getApplication();
                 LibraryActivity parentActivity = (LibraryActivity)getParent();
                 int serverId   = parentActivity.getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
-                int playlistId = parentActivity.getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
                 mServer = app.getServer(serverId);
-                List<Item> items = mServer.getPlaylist(playlistId).getItems();
+                List<Item> items = mServer.getMainLibrary().getItems();
                 setItems(items);
             } catch (Exception ex) {
                 GuiUtil.showErrorAndFinish(this, ex);

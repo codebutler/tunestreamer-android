@@ -34,12 +34,11 @@ public class AlbumActivity extends SongListActivity
     {
         super.onCreate(bundle);
 
-        int serverId   = getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
-        int playlistId = getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
-        int albumId    = getIntent().getExtras().getInt(LibraryActivity.ALBUM_ID);
+        int serverId = getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
+        int albumId  = getIntent().getExtras().getInt(LibraryActivity.ALBUM_ID);
 
         TuneStreamerApp app = (TuneStreamerApp) getApplication();
-        mAlbum = app.getServer(serverId).getPlaylist(playlistId).getAlbum(albumId);
+        mAlbum = app.getServer(serverId).getMainLibrary().getAlbum(albumId);
 
         setTitle(mAlbum.getName());
 
