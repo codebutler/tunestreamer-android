@@ -22,6 +22,7 @@
 
 package com.codebutler.tunestreamer;
 
+import com.codebutler.tunestreamer.util.MusicUtils;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;

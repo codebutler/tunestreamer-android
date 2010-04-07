@@ -27,11 +27,14 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,6 +46,8 @@ public class MainActivity extends ListActivity
     private final int MENU_ADD_SERVER = 1;
     private final int ACTIVITY_ADD = 1;
 
+    private final int DELETE_ITEM_ID = 1;
+
     @Override
     public void onCreate(Bundle icicle)
     {
@@ -50,8 +55,9 @@ public class MainActivity extends ListActivity
 
         setTitle("Select Server");
 
-        TuneStreamerApp app = (TuneStreamerApp) getApplication();
+        registerForContextMenu(getListView());
 
+        TuneStreamerApp app = (TuneStreamerApp) getApplication();
         setListAdapter(new ServerListAdapter(this, app.getServers()));
     }
 
@@ -71,6 +77,34 @@ public class MainActivity extends ListActivity
             startActivityForResult(intent, ACTIVITY_ADD);
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
+        menu.add(0, DELETE_ITEM_ID, 0, "Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem menuItem)
+    {
+        AdapterContextMenuInfo contextInfo = (AdapterContextMenuInfo) menuItem.getMenuInfo();
+
+        Server server = (Server) getListAdapter().getItem((int)contextInfo.id);
+
+        try {
+            switch (menuItem.getItemId()) {
+                case DELETE_ITEM_ID:
+                    TuneStreamerApp app = (TuneStreamerApp) getApplication();
+                    app.deleteServer(server);
+                    ((ServerListAdapter)getListAdapter()).notifyDataSetChanged();
+                    break;
+            }
+        } catch (Exception ex) {
+            GuiUtil.showErrorAndFinish(this, ex);
+        }
+
         return false;
     }
 
@@ -103,10 +137,13 @@ public class MainActivity extends ListActivity
                     String hostname = data.getExtras().getString("hostname");
                     Integer port    = data.getExtras().getInt("port");
 
-                    TuneStreamerApp app = (TuneStreamerApp) getApplication();
-                    app.addServer(hostname, port, null);
-
-                    ((ServerListAdapter)getListAdapter()).notifyDataSetChanged();
+                    try {
+                        TuneStreamerApp app = (TuneStreamerApp) getApplication();
+                        app.addServer(hostname, port, null);
+                        ((ServerListAdapter)getListAdapter()).notifyDataSetChanged();
+                    } catch (Exception ex) {
+                        GuiUtil.showErrorAndFinish(this, ex);
+                    }
                 }
                 break;
         }

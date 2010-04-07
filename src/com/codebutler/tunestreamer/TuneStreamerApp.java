@@ -22,7 +22,14 @@
 
 package com.codebutler.tunestreamer;
 
+import android.util.Log;
 import com.codebutler.rsp.Server;
+import com.codebutler.tunestreamer.db.ServerInfo;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +56,57 @@ public class TuneStreamerApp extends android.app.Application
     public void onCreate ()
     {
         mServers = new ArrayList();
+
+        File file = new File(getFilesDir(), "servers.data");
+
+        if (file.exists()) {
+            try {
+                FileInputStream fileStream = new FileInputStream(file);
+                ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+
+                List<ServerInfo> servers = (List<ServerInfo>) objectStream.readObject();
+                for (ServerInfo serverInfo : servers) {
+                    addServer(serverInfo.host, serverInfo.port, serverInfo.pass);
+                }
+            } catch (Exception ex) {
+                Log.e("TuneStreamerApp", "Failed to load servers: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
     }
 
-    public void addServer (String host, Integer port, String password)
+    public void addServer (String host, Integer port, String password) throws Exception
     {
         mServers.add(new Server(host, port, password));
+        saveServers();
+    }
+
+    public void deleteServer (Server server) throws Exception
+    {
+        for (Server thisServer : mServers) {
+            if (thisServer == server) {
+                mServers.remove(server);
+                return;
+            }
+        }
+        saveServers();
+    }
+
+    void saveServers () throws Exception
+    {
+        File file = new File(getFilesDir(), "servers.data");
+
+        FileOutputStream fileStream = new FileOutputStream(file);
+        ObjectOutputStream objectStream = new ObjectOutputStream(fileStream);
+
+        List<ServerInfo> servers = new ArrayList<ServerInfo>();
+        for (Server server : getServers()) {
+            ServerInfo info = new ServerInfo();
+            info.host = server.getHostname();
+            info.port = server.getPort();
+            info.pass = server.getPassword();
+            servers.add(info);
+        }
+        objectStream.writeObject(servers);
     }
 }

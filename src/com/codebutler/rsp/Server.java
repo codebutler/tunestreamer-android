@@ -79,6 +79,16 @@ public class Server
         return mName;
     }
 
+    public void setPassword (String value)
+    {
+        mPassword = value;
+    }
+
+    public String getPassword ()
+    {
+        return mPassword;
+    }
+
     public int getCount () throws Exception
     {
         checkHaveInfo();
