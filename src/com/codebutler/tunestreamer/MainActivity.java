@@ -99,7 +99,7 @@ public class MainActivity extends ListActivity
                     TuneStreamerApp app = (TuneStreamerApp) getApplication();
                     app.deleteServer(server);
                     ((ServerListAdapter)getListAdapter()).notifyDataSetChanged();
-                    break;
+                    return true;
             }
         } catch (Exception ex) {
             GuiUtil.showErrorAndFinish(this, ex);

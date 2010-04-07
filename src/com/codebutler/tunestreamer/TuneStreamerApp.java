@@ -86,7 +86,7 @@ public class TuneStreamerApp extends android.app.Application
         for (Server thisServer : mServers) {
             if (thisServer == server) {
                 mServers.remove(server);
-                return;
+                break;
             }
         }
         saveServers();
@@ -96,17 +96,21 @@ public class TuneStreamerApp extends android.app.Application
     {
         File file = new File(getFilesDir(), "servers.data");
 
-        FileOutputStream fileStream = new FileOutputStream(file);
+        FileOutputStream fileStream = new FileOutputStream(file, false);
         ObjectOutputStream objectStream = new ObjectOutputStream(fileStream);
 
-        List<ServerInfo> servers = new ArrayList<ServerInfo>();
-        for (Server server : getServers()) {
-            ServerInfo info = new ServerInfo();
-            info.host = server.getHostname();
-            info.port = server.getPort();
-            info.pass = server.getPassword();
-            servers.add(info);
+        try {
+            List<ServerInfo> servers = new ArrayList<ServerInfo>();
+            for (Server server : mServers) {
+                ServerInfo info = new ServerInfo();
+                info.host = server.getHostname();
+                info.port = server.getPort();
+                info.pass = server.getPassword();
+                servers.add(info);
+            }
+            objectStream.writeObject(servers);
+        } finally {
+            objectStream.close();
         }
-        objectStream.writeObject(servers);
     }
 }
