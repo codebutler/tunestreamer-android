@@ -28,7 +28,8 @@ import java.io.Reader;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.http.client.HttpClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -37,11 +38,18 @@ import org.w3c.dom.Element;
 
 public class Util
 {
-    public static String getURL (URL url) throws Exception
+    public static String getURL (URL url, String password) throws Exception
     {
         Log.i("Util.getURL", url.toString());
 
-        HttpClient client = new DefaultHttpClient();
+        DefaultHttpClient client = new DefaultHttpClient();
+
+        if (password != null && password.length() > 0) {
+            UsernamePasswordCredentials creds;
+            creds = new UsernamePasswordCredentials("user", password);
+            client.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+        }
+
         HttpGet method = new HttpGet(url.toURI());
         BasicResponseHandler responseHandler = new BasicResponseHandler();
         return client.execute(method, responseHandler);
@@ -49,11 +57,11 @@ public class Util
 
     public static Document parseXml (String xml) throws Exception
     {
-       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-       DocumentBuilder builder = factory.newDocumentBuilder();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
-       Reader reader = new CharArrayReader(xml.toCharArray());
-       return builder.parse(new org.xml.sax.InputSource(reader));
+        Reader reader = new CharArrayReader(xml.toCharArray());
+        return builder.parse(new org.xml.sax.InputSource(reader));
     }
 
     public static String getChildNodeValue (Element element, String tagName)

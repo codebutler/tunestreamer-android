@@ -15,13 +15,22 @@
         android:title="Hostname"
         android:dialogTitle="Hostname"
         android:singleLine="true"
-        android:persistent="false" />
+        android:persistent="false" 
+        android:inputType="textUri"/>
 
     <EditTextPreference android:key="port"
         android:title="Port"
         android:dialogTitle="Port"
         android:numeric="integer"
+        android:singleLine="true"
         android:persistent="false"
         android:defaultValue="3689" />
+
+    <EditTextPreference android:key="password"
+        android:title="Password"
+        android:dialogTitle="Password"
+        android:persistent="false"
+        android:password="true"
+        android:singleLine="true" />
 
 </PreferenceScreen>

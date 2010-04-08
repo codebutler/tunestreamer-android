@@ -133,7 +133,7 @@ public class Server
         if (mName != null)
             throw new Exception("fetchInfo() already called!");
 
-       String response = Util.getURL(buildUrl("info"));
+       String response = Util.getURL(buildUrl("info"), mPassword);
 
        /*
         <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -170,7 +170,7 @@ public class Server
         if (mPlaylists != null)
             throw new Exception("fetchPlaylists() already called!");
 
-        String response = Util.getURL(buildUrl("db"));
+        String response = Util.getURL(buildUrl("db"), mPassword);
 
         /*
         <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>

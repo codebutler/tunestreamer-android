@@ -136,10 +136,11 @@ public class MainActivity extends ListActivity
                 if (resultCode == RESULT_OK) {
                     String hostname = data.getExtras().getString("hostname");
                     Integer port    = data.getExtras().getInt("port");
+                    String password = data.getExtras().getString("password");
 
                     try {
                         TuneStreamerApp app = (TuneStreamerApp) getApplication();
-                        app.addServer(hostname, port, null);
+                        app.addServer(hostname, port, password);
                         ((ServerListAdapter)getListAdapter()).notifyDataSetChanged();
                     } catch (Exception ex) {
                         GuiUtil.showErrorAndFinish(this, ex);

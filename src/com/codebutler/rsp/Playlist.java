@@ -35,6 +35,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.xml.sax.Attributes;
 
 public class Playlist
@@ -146,128 +150,145 @@ public class Playlist
 
         URL url = mServer.buildUrl("db/" + Integer.toString(mId));
         Log.d("FetchItems", url.toString());
-        InputStream stream = url.openStream();
 
-        /*
-         <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-         <response>
-            <status>
-                <errorcode>0</errorcode>
-                <errorstring></errorstring>
-                <records>0</records>
-                <totalrecords>1</totalrecords>
-            </status>
-            <items>
-                <item>
-                    <id>1</id>
-                    <title>Rock Robotic (Osx Mix)</title>
-                    <artist>Oscillator X</artist>
-                    <album>Techno * Techyes</album>
-                    <genre>Dance &amp; DJ</genre>
-                    <type>mp3</type>
-                    <bitrate>192</bitrate>
-                    <samplerate>44100</samplerate>
-                    <song_length>61440</song_length>
-                    <file_size>1474560</file_size>
-                    <year>0</year>
-                    <track>15</track>
-                    <total_tracks>0</total_tracks>
-                    <disc>0</disc>
-                    <total_discs>0</total_discs>
-                    <bpm>0</bpm>
-                    <compilation>0</compilation>
-                    <rating>0</rating>
-                    <play_count>4</play_count>
-                    <description>MPEG audio file</description>
-                    <time_added>1270096204</time_added>
-                    <time_modified>1270078936</time_modified>
-                    <time_played>1270156178</time_played>
-                    <disabled>0</disabled>
-                    <codectype>mpeg</codectype>
-                </item>
-            </items>
-         </response>
-         */
+        DefaultHttpClient client = new DefaultHttpClient();
 
-        RootElement rootElement = new RootElement("response");
-        Element itemsElement  = rootElement.getChild("items");
-        Element itemElement   = itemsElement.getChild("item");
-        Element idElement     = itemElement.getChild("id");
-        Element titleElement  = itemElement.getChild("title");
-        Element artistElement = itemElement.getChild("artist");
-        Element albumElement = itemElement.getChild("album");
-        Element lengthElement = itemElement.getChild("song_length");
+        String password = mServer.getPassword();
+        if (password != null && password.length() > 0) {
+            UsernamePasswordCredentials creds;
+            creds = new UsernamePasswordCredentials("user", password);
+            client.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+        }
 
-        itemElement.setElementListener(new ElementListener() {
-            public void start(Attributes arg0) {
-                mCurrentItem = new Item(Playlist.this);
-            }
+        HttpGet method = new HttpGet(url.toURI());
 
-            public void end() {
-                mItems.add(mCurrentItem);
+        InputStream stream = client.execute(method).getEntity().getContent();
 
-                // Artist cache
-                String artistName = mCurrentItem.getArtist();
-                if (artistName != null && artistName.trim().length() > 0) {
-                    Artist artist = mArtists.get(artistName);
-                    if (artist == null) {
-                        artist = new Artist(artistName);
-                        mArtists.put(artistName, artist);
-                        mOrderedArtists.add(artist);
-                    }
+        try {
+            /*
+             <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+             <response>
+                <status>
+                    <errorcode>0</errorcode>
+                    <errorstring></errorstring>
+                    <records>0</records>
+                    <totalrecords>1</totalrecords>
+                </status>
+                <items>
+                    <item>
+                        <id>1</id>
+                        <title>Rock Robotic (Osx Mix)</title>
+                        <artist>Oscillator X</artist>
+                        <album>Techno * Techyes</album>
+                        <genre>Dance &amp; DJ</genre>
+                        <type>mp3</type>
+                        <bitrate>192</bitrate>
+                        <samplerate>44100</samplerate>
+                        <song_length>61440</song_length>
+                        <file_size>1474560</file_size>
+                        <year>0</year>
+                        <track>15</track>
+                        <total_tracks>0</total_tracks>
+                        <disc>0</disc>
+                        <total_discs>0</total_discs>
+                        <bpm>0</bpm>
+                        <compilation>0</compilation>
+                        <rating>0</rating>
+                        <play_count>4</play_count>
+                        <description>MPEG audio file</description>
+                        <time_added>1270096204</time_added>
+                        <time_modified>1270078936</time_modified>
+                        <time_played>1270156178</time_played>
+                        <disabled>0</disabled>
+                        <codectype>mpeg</codectype>
+                    </item>
+                </items>
+             </response>
+             */
 
-                    // Album cache
-                    // FIXME: This should support compilation albums!
-                    String albumName = mCurrentItem.getAlbum();
-                    if (albumName != null && albumName.trim().length() > 0) {
-                        Album album = artist.getAlbum(albumName);
-                        if (album == null) {
-                            album = new Album(artist, albumName);
-                            artist.addAlbum(album);
-                            mAlbums.add(album);
+            RootElement rootElement = new RootElement("response");
+            Element itemsElement  = rootElement.getChild("items");
+            Element itemElement   = itemsElement.getChild("item");
+            Element idElement     = itemElement.getChild("id");
+            Element titleElement  = itemElement.getChild("title");
+            Element artistElement = itemElement.getChild("artist");
+            Element albumElement = itemElement.getChild("album");
+            Element lengthElement = itemElement.getChild("song_length");
+
+            itemElement.setElementListener(new ElementListener() {
+                public void start(Attributes arg0) {
+                    mCurrentItem = new Item(Playlist.this);
+                }
+
+                public void end() {
+                    mItems.add(mCurrentItem);
+
+                    // Artist cache
+                    String artistName = mCurrentItem.getArtist();
+                    if (artistName != null && artistName.trim().length() > 0) {
+                        Artist artist = mArtists.get(artistName);
+                        if (artist == null) {
+                            artist = new Artist(artistName);
+                            mArtists.put(artistName, artist);
+                            mOrderedArtists.add(artist);
                         }
-                        album.addItem(mCurrentItem);
+
+                        // Album cache
+                        // FIXME: This should support compilation albums!
+                        String albumName = mCurrentItem.getAlbum();
+                        if (albumName != null && albumName.trim().length() > 0) {
+                            Album album = artist.getAlbum(albumName);
+                            if (album == null) {
+                                album = new Album(artist, albumName);
+                                artist.addAlbum(album);
+                                mAlbums.add(album);
+                            }
+                            album.addItem(mCurrentItem);
+                        }
+                    }
+
+                    mCurrentItem = null;
+
+                    if (progressListener != null) {
+                        if ((mItems.size() % 100) == 0)
+                            progressListener.onProgressChange(mItems.size());
                     }
                 }
+            });
 
-                mCurrentItem = null;
-
-                if (progressListener != null) {
-                    if ((mItems.size() % 100) == 0)
-                        progressListener.onProgressChange(mItems.size());
+            idElement.setEndTextElementListener(new EndTextElementListener() {
+                public void end(String body) {
+                    mCurrentItem.setId(Integer.parseInt(body));
                 }
-            }
-        });
+            });
 
-        idElement.setEndTextElementListener(new EndTextElementListener() {
-            public void end(String body) {
-                mCurrentItem.setId(Integer.parseInt(body));
-            }
-        });
+            titleElement.setEndTextElementListener(new EndTextElementListener() {
+                public void end(String body) {
+                    mCurrentItem.setTitle(body);
+                }
+            });
 
-        titleElement.setEndTextElementListener(new EndTextElementListener() {
-            public void end(String body) {
-                mCurrentItem.setTitle(body);
-            }
-        });
+            artistElement.setEndTextElementListener(new EndTextElementListener() {
+                public void end(String body) {
+                    mCurrentItem.setArtist(body);
+                }
+            });
 
-        artistElement.setEndTextElementListener(new EndTextElementListener() {
-            public void end(String body) {
-                mCurrentItem.setArtist(body);
-            }
-        });
+            albumElement.setEndTextElementListener(new EndTextElementListener() {
+                public void end(String body) {
+                    mCurrentItem.setAlbum(body);
+                }
+            });
 
-        albumElement.setEndTextElementListener(new EndTextElementListener() {
-            public void end(String body) {
-                mCurrentItem.setAlbum(body);
-            }
-        });
+            lengthElement.setEndTextElementListener(new EndTextElementListener() {
+                public void end(String body) {
+                    mCurrentItem.setDuration(Long.parseLong(body) / 1000);
+                }
+            });
 
-        lengthElement.setEndTextElementListener(new EndTextElementListener() {
-            public void end(String body) {
-                mCurrentItem.setDuration(Long.parseLong(body) / 1000);
-            }
-        });
-        android.util.Xml.parse(stream, Xml.Encoding.UTF_8, rootElement.getContentHandler());
+            android.util.Xml.parse(stream, Xml.Encoding.UTF_8, rootElement.getContentHandler());
+        } finally {
+            stream.close();
+        }
     }
 }

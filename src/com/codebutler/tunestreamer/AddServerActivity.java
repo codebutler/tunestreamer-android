@@ -22,6 +22,7 @@
 
 package com.codebutler.tunestreamer;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -39,6 +40,7 @@ public class AddServerActivity extends PreferenceActivity
 {
     EditTextPreference mHostname;
     EditTextPreference mPort;
+    EditTextPreference mPassword;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -51,6 +53,8 @@ public class AddServerActivity extends PreferenceActivity
 
         mPort = (EditTextPreference) findPreference("port");
         bindLabelToValue(mPort);
+
+        mPassword = (EditTextPreference) findPreference("password");
 
         addButtons();
     }
@@ -91,9 +95,23 @@ public class AddServerActivity extends PreferenceActivity
         Button b = (Button) v.findViewById(R.id.server_save);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                String hostname = mHostname.getText();
+                Integer port    = Integer.parseInt(mPort.getText());
+                String password = mPassword.getText();
+
+                if (hostname == null || hostname.length() == 0) {
+                    new AlertDialog.Builder(AddServerActivity.this)
+                        .setMessage("Invalid hostname")
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                    return;
+                }
+
                 Intent intent = new Intent();
-                intent.putExtra("hostname", mHostname.getText());
-                intent.putExtra("port", Integer.parseInt(mPort.getText()));
+                intent.putExtra("hostname", hostname);
+                intent.putExtra("port", port);
+                intent.putExtra("password", password);
                 setResult(RESULT_OK, intent);
                 finish();
             }
