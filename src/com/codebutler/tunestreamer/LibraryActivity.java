@@ -41,25 +41,24 @@ public class LibraryActivity extends TabActivity
     public static final String PLAYLIST_ID = "com.codebutler.tunestreamer.PLAYLIST_ID";
     public static final String ALBUM_ID    = "com.codebutler.tunestreamer.ALBUM_ID";
 
-    private final int MENU_INFO = 1;
+    private final int MENU_INFO       = 1;
+    private final int MENU_DISCONNECT = 2;
 
     private final int INFO_DIALOG = 1;
 
     private TabHost mTabHost;
 
     private Server mServer;
-    private Playlist mLibrary;
 
     @Override
     public void onCreate (Bundle bundle)
     {
         super.onCreate(bundle);
 
-        int serverId   = getIntent().getExtras().getInt(SERVER_ID);
+        int serverId = getIntent().getExtras().getInt(SERVER_ID);
 
         TuneStreamerApp app = (TuneStreamerApp) getApplication();
-        mServer  = app.getServer(serverId);
-        mLibrary = mServer.getMainLibrary();
+        mServer = app.getServer(serverId);
 
         setContentView(R.layout.library);
 
@@ -75,6 +74,9 @@ public class LibraryActivity extends TabActivity
         MenuItem item = menu.add(Menu.NONE, MENU_INFO, 0, "Server Info");
         item.setIcon(android.R.drawable.ic_menu_info_details);
 
+        item = menu.add(Menu.NONE, MENU_DISCONNECT, 0, "Disconnect");
+        item.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+
         return true;
     }
 
@@ -84,6 +86,11 @@ public class LibraryActivity extends TabActivity
         switch (item.getItemId()) {
             case MENU_INFO:
                 showDialog(INFO_DIALOG);
+                return true;
+
+            case MENU_DISCONNECT:
+                mServer.reset();
+                finish();
                 return true;
 
             default:
@@ -96,7 +103,7 @@ public class LibraryActivity extends TabActivity
     {
         switch (id) {
             case INFO_DIALOG:
-                String message = String.format("Total files: %d", mLibrary.getCount());
+                String message = String.format("Total files: %d", mServer.getMainLibrary().getCount());
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Server Info");
                 builder.setPositiveButton(android.R.string.ok, null);

@@ -222,6 +222,13 @@ public class Server
        }
     }
 
+    public void reset ()
+    {
+        mName = null;
+        mCount = -1;
+        mPlaylists = null;
+    }
+
     void checkHaveInfo () throws Exception
     {
         if (mName == null)
