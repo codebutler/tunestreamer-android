@@ -27,6 +27,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -38,6 +39,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.codebutler.rsp.FetchItemsProgressListener;
+import com.codebutler.rsp.Playlist;
 import com.codebutler.rsp.Server;
 import java.util.List;
 
@@ -113,7 +116,7 @@ public class MainActivity extends ListActivity
     {
         final Server server = (Server) list.getItemAtPosition(position);
 
-        ServerLoader.ServerLoaderListener listener = new ServerLoader.ServerLoaderListener () {
+        LoadingHandler.LoadingListener listener = new LoadingHandler.LoadingListener() {
             public void onFinish () {
                 Intent intent = new Intent(MainActivity.this, LibraryActivity.class);
                 intent.putExtra(LibraryActivity.SERVER_ID, server.getId());
@@ -185,6 +188,60 @@ public class MainActivity extends ListActivity
                 textView.setText(String.format("%s:%d", server.getHostname(), server.getPort()));
 
             return convertView;
+        }
+    }
+
+    private class ServerLoader
+    {
+        private Server         mServer;
+        private LoadingHandler mHandler;
+
+        public ServerLoader (Activity activity, Server server, LoadingHandler.LoadingListener listener)
+        {
+            mServer  = server;
+            mHandler = new LoadingHandler(activity, listener);
+        }
+
+        public void load ()
+        {
+            mThread.start();
+        }
+
+        private Thread mThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    updateProgress(LoadingHandler.STATUS_FETCHING_INFO, null);
+
+                    mServer.fetchInfo();
+
+                    updateProgress(LoadingHandler.STATUS_FETCHING_PLAYLISTS, null);
+
+                    mServer.fetchPlaylists();
+
+                    Playlist library = mServer.getMainLibrary();
+                    mHandler.setPlaylist(library);
+
+                    updateProgress(LoadingHandler.STATUS_FETCHING_SONGS, null);
+
+                    library.fetchItems(new FetchItemsProgressListener() {
+                        public void onProgressChange(Integer progress) {
+                            updateProgress(LoadingHandler.STATUS_IMPORTING_SONGS, progress);
+                        }
+                    });
+
+                    updateProgress(LoadingHandler.STATUS_FINISHED, null);
+                } catch (Exception ex) {
+                    updateProgress(LoadingHandler.STATUS_ERROR, ex);
+                }
+            }
+        });
+
+        private void updateProgress (int state, Object obj)
+        {
+            Message message = Message.obtain();
+            message.what = state;
+            message.obj  = obj;
+            mHandler.sendMessage(message);
         }
     }
 }

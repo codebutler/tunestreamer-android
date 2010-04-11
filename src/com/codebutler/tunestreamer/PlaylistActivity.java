@@ -23,38 +23,73 @@
 package com.codebutler.tunestreamer;
 
 import android.os.Bundle;
+import android.os.Message;
+import com.codebutler.rsp.FetchItemsProgressListener;
 import com.codebutler.rsp.Playlist;
 
 public class PlaylistActivity extends SongListActivity
 {
-    Playlist mPlaylist;
+    private Playlist mPlaylist;
+    private LoadingHandler mHandler;
 
     @Override
     public void onCreate (Bundle bundle)
     {
         super.onCreate(bundle);
         
-        int serverId   = getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
-        int playlistId = getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
-
-        TuneStreamerApp app = (TuneStreamerApp) getApplication();
-        mPlaylist = app.getServer(serverId).getPlaylist(playlistId);
-
-        setTitle(mPlaylist.getTitle());
-
-        if (!mPlaylist.hasItems()) {
-            try {
-                // FIXME: This should be made non-blocking.
-                mPlaylist.fetchItems(null);
-            } catch (Exception ex) {
-                GuiUtil.showErrorAndFinish(this, ex);
-            }
-        }
-
         try {
-            setItems(mPlaylist.getItems());
+            int serverId   = getIntent().getExtras().getInt(LibraryActivity.SERVER_ID);
+            int playlistId = getIntent().getExtras().getInt(LibraryActivity.PLAYLIST_ID);
+
+            TuneStreamerApp app = (TuneStreamerApp) getApplication();
+            mPlaylist = app.getServer(serverId).getPlaylist(playlistId);
+
+            setTitle(mPlaylist.getTitle());
+
+            if (!mPlaylist.hasItems()) {
+                mHandler = new LoadingHandler(this, new LoadingHandler.LoadingListener() {
+                    public void onFinish() {
+                        try {
+                            setItems(mPlaylist.getItems());
+                            //((ArrayAdapter)getListAdapter()).notifyDataSetChanged();
+                        } catch (Exception ex) {
+                            GuiUtil.showErrorAndFinish(PlaylistActivity.this, ex);
+                        }
+                    }
+                });
+                mHandler.setPlaylist(mPlaylist);
+
+                Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            updateProgress(LoadingHandler.STATUS_FETCHING_SONGS, null);
+
+                            mPlaylist.fetchItems(new FetchItemsProgressListener() {
+                                public void onProgressChange(Integer progress) {
+                                    updateProgress(LoadingHandler.STATUS_IMPORTING_SONGS, progress);
+                                }
+                            });
+
+                            updateProgress(LoadingHandler.STATUS_FINISHED, null);
+                        } catch (Exception ex) {
+                            updateProgress(LoadingHandler.STATUS_ERROR, ex);
+                        }
+                    }
+                });
+                thread.start();
+            } else {
+                setItems(mPlaylist.getItems());
+            }
         } catch (Exception ex) {
             GuiUtil.showErrorAndFinish(this, ex);
         }
+    }
+
+    private void updateProgress (int state, Object obj)
+    {
+        Message message = Message.obtain();
+        message.what = state;
+        message.obj  = obj;
+        mHandler.sendMessage(message);
     }
 }
